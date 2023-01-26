@@ -74,12 +74,10 @@ Tikslui įgyvendinti keliami uždaviniai:
 %klasifikacijos, sisteminimo metodus bei apibendrinimus, dėstoma sukaupta ir išanalizuota medžiaga.
 \section{Pagrindinė tiriamoji dalis}
 % citation about impact of bitcoin on other coins? Explain mining (savoka)?
-%koks tinklas?
+% koks tinklas?
 Pagrindinė ir pirmoji kriptovaliuta - Bitcoin. Nors pirmieji 50 BTC buvo "iškasti" 2009 metų pradžioje, Bitcoin susilaukė didesnio dėmesio
-% kas atsitiko 2013 metais
 tik 2013 metais\cite{macdonell2014popping}. Ši kriptovaliuta buvo laikoma ateities valiuta dėl savo naujoviškumo ir decentralizavimo, bet susilaukdavo ir 
 neigiamų atsilipiemų dėl atsiskaitymo nelegaliuose prekybos vietuose internete. 
-% Source on bigggest revenue
 Vienas pirmųjų ir itin didelės apyvartos sulaukęs nelegalių prekių tinklalapis "Silkroad" atsiskaitymui už prekes naudojo Bitcoin.
 Didelė apyvarta skatino bitcoin augimą, susidomėjimą ir kitų kriptovaliutų progresą.
 % Source on correlation
@@ -105,17 +103,12 @@ apsaugotos nuo vyriausybės kišimosi. Ankščiau minėtos savybės suteikia ano
 apgalvotai ir trumpam padidinima, taip pakeliant jos kainą, vėliau, kai kainą yra pasiekusi tinkamą tašką, organizatoriai, staigiai parduoda savo
 turimą kiekį, taip pasipelnydami\cite{xu2019anatomy}.
 
-% Perkelti šį sezoniškumą tikriausiai prie SARFIMA ar kitos vietos
-% Abi rinkos turi sezoniškumo laikotarpį: meškų turgų (angl. bear market) ir bulių turgų(angl. bull market), ankstesnis reiškiantis, 
-% jog kainos krenta ir pasilieka žemomis, o pastaris reiškiantis - atvirkščiai.
 %social media influence?
 Pagrindinis tyrimas šiame darbe yra tinkamiausio auto regresinio modelio parinkimas automatizuotam robotui lošėjui. Lošimo procesas tam tikrą laiką gali būti atliekamas žmogaus, 
 stebėti besikeičiančias kainas ir atitinkamai elgtis, tačiau toks darbas yra monotoniškas ir atsiranda natūrali terpė jį automatizuoti. Automatizavimui
 reikia taikyti pasirinktą strategiją, kuri spręstų kada yra tinkamas metas įsigyti kriptovaliutą, o kada parduoti, bet pirmiausia reikalingas tinkamas prognozavimo modelis.
 Auto regresiniai modeliai taikomi laiko eilutėmis yra paplitę statistikoje norint prognozuoti tendenciją ateityje. Modelio prognozės tikslumui bei tinkamumui palyginti 
 bus naudojama santykinė ir absoliuti klaidos.
-% Egzistuoja populiarus aforizmas statistikoje "Visi modeliai yra neteisingi", kuris dažnai yra pratęsiamas 
-% kaip "Visi modeliai yra neteisingi, bet kai kurie yra naudingi", todėl šiame darba bus bandoma surasti tinkamiausią modelį šiai problemai.
 
 \subsection{Darbinė aplinka}
 Šiam robotui ir statistiniams modeliams teks naudotis jau sukurtais įrankiais, kurie palengvins darbą. Naudojama Python programavimo kalbą, 
@@ -134,7 +127,6 @@ bibliotekų palaiko Python programavimo kalbą.
 Oficialus API yra labai paprastas ir lengvasvoris, todėl didelio patogumo nėra, tik paprasčiausios užklausos,
 kurias visvien reikėtų apdoroti, labai padeda padaryti šis wrapper API - python-binance.
 
-% Straipsnis kuriuo remiasi šitas darbas
 \subsubsection{Binance}
 Binance yra didžiausia kriptovaliutų birža pagal prekybos apimtį, turinti itin didelį valiutų pasiulą ir patogiai prieinamus duomenis. Ši birža taip pat
 suteikia galimybė "lošti" kriptovaliutomis testiniame tinkle. Tinklo paskirtis yra lengvai nuspėjama iš pavadinimo, jame galima atlikti tuos pačius 
@@ -151,7 +143,7 @@ matomų 1 lentelėje.
 \begin{table}[H]\footnotesize
   % tablesgenerator.com - converts calculators (e.g. excel) tables to LaTeX
   \centering
-  \caption{Pradinis likutis}    % Antraštė įterpiama prieš lentelę
+  \caption{Pradinis likutis}
   {\begin{tabular}{|l|c|} \hline
       Kriptovaliuta & Kiekis  \\
       \hline
@@ -174,9 +166,7 @@ nuo nulio.
 
 % interpolation vs extrapolation?
 \section{Laiko eilučių analizė}
-% Repetition
 "Visi modeliai yra klaidingi. Kai kurie modeliai yra naudingi" (angl. "All models are wrong. Some models are useful") - citata priskiriama George Box, kurios
-% Source is tos knygos kur tarp googles yra
 reikėtų nepamiršti analizuojant laiko eilutes. Šis analizės būdas bando pastebėti pasikartojančius modelius bėgant laikui, jog būtų galima atlikti kuo tikslesnes
 prognozes apie ateitį. 
 Dažnu atveju tai yra vienas ar keli izoliuoti kintamieji, kurie yra stebimi nustatytą laiko tarpą ar surenkant jų istorinius duomenis. Laiko eilučių duomenų 
@@ -239,16 +229,16 @@ pritaikius ADF testą{\cite{seabold2010statsmodels}} AMZN akcijų duomenims (\te
 \begin{tabularx}{\linewidth}{|X|X|X|X|X|X|}
   \hline
   \textbf{Time Series} & \textbf{ADF Statistic} & \textbf{p-value} & \textbf{1\% Critical Value} & \textbf{5\% Critical Value} & \textbf{10\% Critical Value} \\ \hline
-  Daily Returns        & -7.087727              & 0.000000         & -3.542                      & -2.910                      & -2.593                       \\ \hline
-  Daily Close Price    & -1.640623              & 0.461935         & -3.542                      & -2.910                      & -2.593                       \\ \hline
+  Daily Returns        & -7.087                 & 0.000            & -3.542                      & -2.910                      & -2.593                       \\ \hline
+  Daily Close Price    & -1.640                 & 0.461            & -3.542                      & -2.910                      & -2.593                       \\ \hline
 \end{tabularx}
 
 \vspace{10pt}
 Pagal šiuos rezultatus
 \begin{itemize}
-  \item ADF statistika yra skaičius, kuris lyginamas su kritinėmis vertėmis iš lentelės (skirtingais lygiais), kad būtų nuspręsta, ar atmesti ar priimti nulio hipotezę apie stacionarumą.
-  \item Pirmu atveju ADF statistika dienos grąžoms yra -7.087727, kuri mažesnė, nei kritinė vertė -3.542 1\% lygyje. Todėl nulinė hipotezė yra atmesta ir laiko seka laikoma stacionaria.
-  \item Antru atveju ADF statistika dienos uždarymo kainoms yra -1.640623, kuris yra nemažesnė, nei kritinė vertė -3.542 1\% lygyje. Todėl nulio hipotezė nėra atmesta ir laiko seka laikoma nestacionari.
+  \item ADF statistika yra skaičius, kuris lyginamas su kritinėmis vertėmis iš lentelės (skirtingais lygiais), kad būtų nuspręsta, ar atmesti ar priimti nulinę hipotezę apie stacionarumą.
+  \item Pirmu atveju ADF statistika dienos grąžoms yra -7.087, kuri mažesnė, nei kritinė vertė -3.542 1\% lygyje. Todėl nulinė hipotezė yra atmesta ir laiko eilutė laikoma stacionari.
+  \item Antru atveju ADF statistika dienos uždarymo kainoms yra -1.640, kuri yra nemažesnė, nei kritinė vertė -3.542 1\% lygyje. Todėl nulio hipotezė nėra atmesta ir laiko eilutė laikoma nestacionari.
 \end{itemize}
 
 \section{Autoregresiniai modeliai}
@@ -256,7 +246,6 @@ Vienas iš būdų analizuoti laiko eilutės yra autoregresija ir ją naudojantis
 Populiarusi ir dažniausiai sutinkami modeliai yra ARMA(p, q) ir ARIMA(p, d, q).
 Šie modeliai taip pat naudojasi anksčiau nepaminėtu MA modeliu kuris yra slankaus vidurkio modelis (angl. MA - moving average).
 Taip pat yra SARIMA, SARFIMA ir kitų modelių, turinčių savo specifinius panaudjimo atvejus. 
-Toliau apžvelgsime detaliau autoregresinius modelius ir kaip jie galėtų būti panaudoti iškeltiems užduotims šiame darbe spręsti.
 
 \subsection{AR modelis}
 AR (angl. autoregressive) modelis remiasi tik praeities duomenimis, kad nuspėti kintamojo reikšme ateityje, ieškoma ar pastebimas pasikartojantis
@@ -318,7 +307,7 @@ Skyriuje aprašomi žingsniai, kurių buvo imtasi atliekant tyrimus ir analizę 
 Tyrimo metu pagrindinis dėmesys buvo skiriamas tinkamų kriptovaliutų kainų analizės ir prognozavimo įrankiams ir metodams nustatyti bei skirtingų modelių veikimui įvertinti. 
 Duomenys buvo renkami iš Binance testavimo tinklo naudojant python-binance API, o duomenims pritaikyti statistinės ir laiko eilučių analizės metodai. 
 Kainų prognozavimui buvo naudojami autoregresyvūs modeliai, tokie kaip ARIMA ir SARIMA. 
-Šio tyrimo išvados taps pagrindu kuriant prekybos robotą būsimame darbe.
+Šio tyrimo išvados yra vienas iš pagrindų kuriant prekybos robotą.
 
 
 \subsection{Modeliai}
@@ -336,8 +325,9 @@ Kadangi tinklas yra testinis, jame prekiaujama nevisomis galimomis kriptovaliut�
 i) BTC/BUSD, ii) LTC/BUSD, iii) XRP/BUSD.
 Gaunamuose duomenyse yra daugiau informacijos bet bus naudojama tik datos ir `close' stulpelis, parodantis konkrečios kriptovaliutos uždarymo kainą tam tikru laiku. Tai yra paskutinė 
 kaina, už kurią buvo prekiaujama tam tikru laikotarpiu, pavyzdžiui, valandą ar dieną. Uždarymo kaina yra svarbi, nes ji atspindi galutinę kainą, už kurią pirkėjai ir pardavėjai
-sutarė prekiauti kriptovaliuta. Duomenys bus naudojami tokie kokie yra ir iškarto perduodami į modelius. Modeliui apmokyti naudojamas 90 procentų dumomenų rinkinio dydis. Kitus 10\% bandoma prognozuoti po vieną reikšmę į priekį. Modeliui atlikus prognozė, 
-jis yra iš naujo apmokomas pridėjus tikrąją sekančią vertę prie mokymo rinkinio ir taip vėl yra prognozuojama kitą reikšmė, jau su naujai apmokytu modeliu.
+sutarė prekiauti kriptovaliuta. Duomenys bus naudojami tokie kokie yra ir iškarto perduodami į modelius. Modeliui apmokyti naudojamas 90 procentų dumomenų rinkinio dydis.
+Kitus 10\% bandoma prognozuoti po vieną reikšmę į priekį. Modeliui atlikus prognozė, jis yra iš naujo apmokomas pridėjus tikrąją sekančią vertę prie mokymo rinkinio ir
+taip vėl yra prognozuojama kitą reikšmė, jau su naujai apmokytu modeliu.
 
 % A detailed explanation of the model fitting process, including the specific parameters that you will be using for each of the AR models and any assumptions that you will be making.
 \subsection{Modelių implementavimas}
@@ -452,7 +442,7 @@ optimalūs parametrai. Po šito inicijuojamas tuščias sąrašas, vadinamas mod
 
 Šie rezultatai rodo ARIMA ir SARIMA modelių našumą prognozuojant trijų skirtingų simbolių - BTCBUSD, LTCBUSD ir XRPBUSD - kriptovaliutų kainas.
 Modelių veikimui įvertinti naudojami MSE (Mean Squared Error) ir MAPE (Mean Absolute Percentage Error). 
-MSE matuoja vidutinį skirtumą tarp numatytų ir faktinių verčių kvadratu, o MAPE – vidutinį procentinį skirtumą tarp numatomų ir faktinių verčių. 
+MSE matuoja vidutinį skirtumą tarp numatytų ir faktinių verčių kvadratu, o MAPE - vidutinį procentinį skirtumą tarp numatomų ir faktinių verčių. 
 Abu šie rodikliai yra svarbūs vertinant modelių tikslumą.
 
 Taikymo rezultatai trims skirtingoms kriptovaliutų poroms: BTCBUSD, LTCBUSD ir XRPBUSD. Grafikuose matosi prognozuota ir tikra kaina laikotarpiu.
@@ -580,12 +570,7 @@ prekybos rinką ją konvertuoją i panašių token valiuta kaip BUSD(us -regulat
 
 \textbf{MAPE} - Vidutinė  bsoliučioji paklaida išreikšta procentais, angl. (Mean absolute percentage error)
 
-\printbibliography[heading=bibintoc] % Literatūros šaltiniai aprašomi
-% bibliografija.bib faile. Šaltinių sąraše nurodoma panaudota literatūra,
-% kitokie šaltiniai. Abėcėlės tvarka išdėstoma tik darbe panaudotų (cituotų,
-% perfrazuotų ar bent paminėtų) mokslo leidinių, kitokių publikacijų
-% bibliografiniai aprašai (šiuo punktu pasirūpina LaTeX). Aprašai pateikiami
-% netransliteruoti.
+\printbibliography[heading=bibintoc] % Aprašomi literatūros šaltiniai
 
 \appendix  % Priedai
 % Prieduose gali būti pateikiama pagalbinė, ypač darbo autoriaus savarankiškai
