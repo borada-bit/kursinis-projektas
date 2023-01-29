@@ -53,19 +53,16 @@ Kai rinka yra prieinama visa parą dirbant be sustojimo yra nepraktiška, bei ne
 procesą - įdarbinti automatizuotą prekybos robotą, kuris gebėtų analizuoti rinkos duomenis ir prognozuoti tolimesnė rinkos eigą.
 
 
-Šio darbo tikslas yra sukurti automatizuotą kriptovaliutų prekybos robotą. 
-Darbe tiriama standartinių autoregreisivių modelių veikimas ir gilaus mokymo modelio veikimas.
-Darbe tiriama, kokį modelį galima taikyti: autoregresyvųjį ar gilaus mokymo tiksliausiai nuspėti kriptovaliutos kainas ateityje.
-Pagal gautus rezultatus ir tikslumą galima spręsti, koks modelis yra tinkamiausias robotui naudoti.
-
+Pratęsiant kursinio darbo temą, šio kursinio darbo projekto tikslas yra sukurti automatizuotą kriptovaliutų prekybos robotą. 
+Darbe pritaikomas autoregresinių modelių veikimas, pagal kuriuos robotas galės remtis atliekant kriptovaliutų rinkos mainus. 
 
 Tikslui įgyvendinti keliami uždaviniai:
 \begin{itemize}
-  \item Mokslinės literatūros analizė,
-  \item Atlikti autoregresinių, gilaus mokymo modelių analizę,
-  \item Skirtingų modelių pritaikymas duomenims,
-  \item Sukurti robotą gebanti prekiauti šiais modeliais
-  \item Ištirti gautus rezultatus atlikus modelių taikymą.
+  \item mokslinės literatūros analizė,
+  \item autoregresinių modelių analizė ir pritaikymas,
+  \item sukurti robotą gebanti remtis ištirtų modelių prognozėmis,
+  \item paleisti robotą prekiauti testiniame tinkle,
+  \item ištirti gautus rezultatus.
 \end{itemize}
 
 
@@ -543,12 +540,14 @@ Verta paminėti, kad šie rezultatai yra naudojami konkrečiams duomenų rinkini
 \section{Rezultatai ir išvados}
 Sukurtas robotas gebantis prekiauti kriptovaliutomis.
 \begin{itemize}
-  \item Sukurtas robotas
+  \item atlikta autoregresinių modelių analizė,
+  \item parinkta naudoti ARIMA modelį prognozėmis,
+  \item sukurtas robotas gebantis prekiauti remantis ARIMA prognozėmis
 \end{itemize}
 
 Neišvengiama, jog tokiame trumpame darbe būtų aptartos visos įmanomos sritys ir atvejai, taigi tolimesnei tyrimo eigai pasiūlymas nagrinėti kitus modelius
-ir duomenų rinkinius, kad būtų galima palyginti su prognozavimo būdais aptartais šiame darbe.
-Šiame darbe apsistojama ties kainų tendencijų prognozavimų, tolimesnė programos galima eiga būtų realizuoti konkrečias strategijas robotui lošėjui.
+ir duomenų rinkinius, kad būtų galima palyginti prognozavimo būdus aptartais šiame darbe. Taip pat galima analizuoti alternatyvias strategijas kurias galima
+pritaikyti robotui ir jas palyginti. 
 
 \sectionnonum{Sąvokų apibrėžimai}
 \textbf{API} - Aplikacijų programavimo sąsaja (angl. Application programming interface), tai sistemos suteikiama sąsaja, kuria galima naudotis norint pasiekti tos sistemos
