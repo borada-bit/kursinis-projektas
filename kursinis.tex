@@ -364,7 +364,7 @@ Abi šios metrikos gali būti naudojamos vertinant modelių veikimą ir lyginant
 % A schematic or flowchart that visually illustrates the steps of your methodology, which will help your readers understand the process you used.
 % A discussion of any evaluation metrics you will be using to assess the performance of your models, such as mean squared error or Akaike information criterion.
 
-\section{Realizacija}
+\section{Prognozių realizacija}
 Šio darbo realizavimo ir rezultatų skyriuje pristatomas metodikos įgyvendinimas ir gauti rezultatai. 
 Skyriuje pateikiamos duomenų ir prognozavimo rezultatų vizualizacijos, taip pat kodo fragmentai, demonstruojantys naudojamų modelių įgyvendinimą.
 Vizualizacijos suteikia aiškų vaizdą apie modelių veikimą ir prognozių tikslumą. 
@@ -534,10 +534,76 @@ LTCBUSD ir XRPBUSD poroje abiejų modelių MSE ir MAPE yra panašiai žemi, o ta
 
 Verta paminėti, kad šie rezultatai yra naudojami konkrečiams duomenų rinkiniui, taigi modeliai gali duoti skirtingus rezultatus kitiems rinkiniams.
 
+\section{Prekybos robotas}
+Skyriuje siekiama nuodugniai pažvelgti į sandorių atlikimo metodiką bei įvairių roboto kūrimo strategijų taikytų strategijų rezultatus.
+Pagrindinis dėmesys bus skiriamas paaiškinimui, kaip vykdomi sandoriai ir kokie rezultatai gaunami naudojant skirtingus metodus.
+
+\subsection{Metodika}
+Robotas yra parašytas naudojamas "python" programavimo kalbą. Yra keli pagrindiniai žingsniai roboto veikime
+
+\begin{enumerate}
+  \item Įkeliama konfigūracija ir simbolių duomenys iš failų, duomenys patikranami pagal validacijos schemas ir inicijuojami API prieigos ir klasės kintamieji.
+  \item Gaunami istoriniai simbolių "klines" duomenys ir išsaugojami naudojimui.
+  \item Skaičiuojama ARIMA prognozes simbolių porų kainoms arba skaičiuojama slankiuosius vidurkius (SMA) simbolių poroms pagal prekybos parametrus.
+  \item Siūlomas vartotojui sąveikos su prekybos robotu parinkčių meniu, pvz., likučių, pavedimų, pozicijų, simbolių informacijos spausdinimas ir pavedimų atšaukimas.
+  \item Robotas bando atlikti sandorius, jei tenkinamos tam tikros sąlygos, pavyzdžiui, jei trumpasis SMA kerta virš ilgojo SMA, t.y. strategija tenkina sąlygas.
+  \item Jeigu įvykdoma transakcija, jį išsaugojama žurnale.
+  \item Išsaugo porų duomenis, kai vartotojas išeina iš programos.
+\end{enumerate}
+
+Tai yra trumpa ir bendra metodika visais atvejais.
+\subsection{Rezultatai}
+
+Toliau robotui sandoriams atlikti pasirinktos šios kriptovaliutų poros 
+\begin {itemize}
+\item BTC/BUSD
+\item LTC/BUSD
+\item XRP/BUSD
+\item BNB/BTC
+\item ETH/BTC
+\end {itemize}
+Šios poros yra populiarios ir dažnai prekiaujamos tinkle, todėl jomis bus paprasčiau naudotis. 
+\subsubsection{Strategijos}
+\subsubsubsection{Tendencijos sekimas}
+
+Šiuo atveju vykdoma strategija yra standartinė pirkimo ir laikymo strategija. Robotas naudoja ARIMA, kad sudarytų pasirinktų kriptovaliutų porų kainos prognozes. 
+Kai prognozė numato kylančią kainą, robotas įvykdys pirkimo pavedimą, o prognozei numatant mažėjančią kainą robotas vykdys pardavimo pavedimą. 
+Šio tipo strategija paremta idėja, kad galima pasipelnyti iš rinkos tendencijų perkant pigiai ir parduodant brangiai.
+Robotas naudoja ARIMA, kad analizuotų istorinius kainų duomenis ir prognozuotų būsimus kainų pokyčius, kuriuos jis naudoja priimdamas pirkimo ir pardavimo sprendimus.
+Vadovaudamasis šia strategija, robotas siekia pasinaudoti rinkos tendencijomis. 
+
+\begin {itemize}
+\item ARIMA prognozuoja kriptovaliutos kainą.
+\item Remiantis prognoze, jei modelis numato didėjimo tendenciją, bandoma nusipirkti kriptovaliutą, o jei prognozuoja mažėjimo tendenciją, bandoma kriptovaliutą parduoti.
+\item Nuolat stebima kriptovaliutos kainą ir atitinkamai atnaujinamas ARIMA modelis, kad būtų atnaujintos prognozes.
+\end{itemize}
+
+Gauti rezultatai taikant šią strategiją
+
+\subsubsubsection{"Mean reversion"}
+
+Mean Reversion yra prekybos strategija, pagrįsta idėja, kad kainos laikui bėgant grįžta į savo vidurkį. 
+Tai apima dabartinės kainos palyginimą su istorine vidutine kaina. Sandoris yra sudaromas pagal tai, ar dabartinė kaina yra didesnė ar mažesnė už vidutinę.
+Pagal šią strategiją, jei dabartinė kaina yra didesnė už istorinį vidurkį, prekiautojas parduotų turtą, o jei ji yra mažesnė, prekiautojas pirktų. 
+Tikslas - pasinaudoti rinkos tendencija grįžti prie vidurkio.
+
+\begin {itemize}
+\item Apskaičiuojama kriptovaliutos pastarųjų 5 ir 15 intervalų (15 minučių) paprastą slenkantį vidurkį (SMA).
+\item Jei 5 intervalų SMA yra didesnis nei 15 intervalų SMA, bandoma parduoti kriptovaliutą.
+\item Jei 5 intervalų SMA yra mažesnis nei 15 intervalų SMA, bandoma pirkti kriptovaliutą.
+\item Nuolat stebima kriptovaliutos kaina ir atitinkamai atnaujinami SMA.
+\end {itemize}
+
+Strategija grindžiama idėja, kad kai kriptovaliutos kaina nukrypsta nuo vidutinės vertės, ji ilgainiui grįš į vidutinę. Šiuo atveju vidurkį atstoja kainos paprastasis slankusis vidurkis (SMA),
+o nuokrypis nuo vidurkio nustatomas lyginant trumpalaikį SMA ir ilgalaikį SMA. Jei trumpalaikis SMA yra didesnis nei ilgalaikis SMA, tada daroma prielaida, kad kaina nukrypsta nuo vidurkio
+ir galiausiai grįš, todėl bandoma atlikti pardavimą. Ir atvirkščiai, jei trumpalaikis SMA yra mažesnis už ilgalaikį SMA, tada pateikiamas pirkimo pavedimas, numatant, kad kaina grįš į vidutinę.
+
+\subsubsubsection{"Momentum"}
+
 
 % Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
 % suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
-\section{Rezultatai ir išvados}
+\section{Išvados}
 Sukurtas robotas gebantis prekiauti kriptovaliutomis.
 \begin{itemize}
   \item atlikta autoregresinių modelių analizė,
