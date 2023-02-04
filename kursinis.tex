@@ -563,8 +563,8 @@ Toliau robotui sandoriams atlikti pasirinktos šios kriptovaliutų poros
 \item ETH/BTC
 \end {itemize}
 Šios poros yra populiarios ir dažnai prekiaujamos tinkle, todėl jomis bus paprasčiau naudotis. 
-\subsubsection{Strategijos}
-\subsubsubsection{Tendencijos sekimas}
+\subsection{Strategijos}
+\subsubsection{Tendencijos sekimas}
 
 Šiuo atveju vykdoma strategija yra standartinė pirkimo ir laikymo strategija. Robotas naudoja ARIMA, kad sudarytų pasirinktų kriptovaliutų porų kainos prognozes. 
 Kai prognozė numato kylančią kainą, robotas įvykdys pirkimo pavedimą, o prognozei numatant mažėjančią kainą robotas vykdys pardavimo pavedimą. 
@@ -578,11 +578,9 @@ Vadovaudamasis šia strategija, robotas siekia pasinaudoti rinkos tendencijomis.
 \item Nuolat stebima kriptovaliutos kainą ir atitinkamai atnaujinamas ARIMA modelis, kad būtų atnaujintos prognozes.
 \end{itemize}
 
-Gauti rezultatai taikant šią strategiją
+\subsubsection{Grįžimas prie vidurkio}
 
-\subsubsubsection{"Mean reversion"}
-
-Mean Reversion yra prekybos strategija, pagrįsta idėja, kad kainos laikui bėgant grįžta į savo vidurkį. 
+Grįžimas prie vidurkio yra prekybos strategija, pagrįsta idėja, kad kainos laikui bėgant grįžta į savo vidurkį. 
 Tai apima dabartinės kainos palyginimą su istorine vidutine kaina. Sandoris yra sudaromas pagal tai, ar dabartinė kaina yra didesnė ar mažesnė už vidutinę.
 Pagal šią strategiją, jei dabartinė kaina yra didesnė už istorinį vidurkį, prekiautojas parduotų turtą, o jei ji yra mažesnė, prekiautojas pirktų. 
 Tikslas - pasinaudoti rinkos tendencija grįžti prie vidurkio.
@@ -616,6 +614,7 @@ ir duomenų rinkinius, kad būtų galima palyginti prognozavimo būdus aptartais
 pritaikyti robotui ir jas palyginti. 
 
 \sectionnonum{Sąvokų apibrėžimai}
+
 \textbf{API} - Aplikacijų programavimo sąsaja (angl. Application programming interface), tai sistemos suteikiama sąsaja, kuria galima naudotis norint pasiekti tos sistemos
 funckionalumą ar apsikeisti duomenimis.
 
@@ -627,8 +626,9 @@ kokybės (bet nebūtinai optimalius) sprendinius per priimtiną laiką. Algoritm
 
 \textbf{Kriptovaliuta} - Kriptovaliuta yra skaitmeninė arba virtuali valiuta, kuri yra apsaugota kriptografija, todėl beveik neįmanoma jos padirbti ar išleisti dvigubai.
 
-\textbf{Kriptovaliutų pora} - Kriptovaliutų pora rinkoje yra naudojama prekiaujant. Kriptovaliutos yra susietos poromis, tad norint nusipirkt BTC valiutos pirmiausia reikia surasti 
+\textbf{Kriptovaliutų pora} - Kriptovaliutų pora rinkoje yra naudojama prekiaujant. Kriptovaliutos yra susietos poromis, norint nusipirkt BTC valiutos pirmiausia reikia surasti 
 galimus keitimo variantus, jei egzistuoja pora BTC/BUSD, galima nusipirkti BTC kriptovaliutos uz turimas BUSD valiutas. Dažnu atveju rinkoje pasidėjus ("FIAT") valiuta
+prekybos rinką ją konvertuoją i panašią valiuta kaip BUSD, USDT ar BNB.
 prekybos rinką ją konvertuoją i panašių token valiuta kaip BUSD(us -regulated stablecoin), USDT (usd tether) ar BNB (binance coin)
 
 \textbf{MSE} - Vidutinė kvadratinė paklaida, angl. (Mean squared error)
