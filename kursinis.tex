@@ -298,14 +298,13 @@ ankščiau minėtą ARIMA modelį.
 SARIMA galima išreikšti kaip ARIMA(p,d,q)(P,D,Q)[S], kur p,d,q standartiniai ARIMA modelio parametrai, o P - sezoniškumo autoregresivumo laipsnis,
 D - sezoniškumo diferencijavimo laipsnis, Q - sezoniškumo slankiojo vidurkio laipsnis ir S - sezoniškumo ciklio ilgis. 
 
-\section{Metodika}
+\section{Prognozių metodika}
 
 Skyriuje aprašomi žingsniai, kurių buvo imtasi atliekant tyrimus ir analizę kuriant automatizuotą kriptovaliutų prekybos robotą. 
 Tyrimo metu pagrindinis dėmesys buvo skiriamas tinkamų kriptovaliutų kainų analizės ir prognozavimo įrankiams ir metodams nustatyti bei skirtingų modelių veikimui įvertinti. 
 Duomenys buvo renkami iš Binance testavimo tinklo naudojant python-binance API, o duomenims pritaikyti statistinės ir laiko eilučių analizės metodai. 
 Kainų prognozavimui buvo naudojami autoregresyvūs modeliai, tokie kaip ARIMA ir SARIMA. 
 Šio tyrimo išvados yra vienas iš pagrindų kuriant prekybos robotą.
-
 
 \subsection{Modeliai}
 Prognozavimui bus naudojami ARIMA ir SARIMA modelis. Kadangi kriptovaliutų kainų duomenys nėra stacionarūs, todėl naudojamas ARIMA modelis, kuris gali taikyti diferencijavimą.
@@ -535,34 +534,97 @@ LTCBUSD ir XRPBUSD poroje abiejų modelių MSE ir MAPE yra panašiai žemi, o ta
 Verta paminėti, kad šie rezultatai yra naudojami konkrečiams duomenų rinkiniui, taigi modeliai gali duoti skirtingus rezultatus kitiems rinkiniams.
 
 \section{Prekybos robotas}
-Skyriuje siekiama nuodugniai pažvelgti į sandorių atlikimo metodiką bei įvairių roboto kūrimo strategijų taikytų strategijų rezultatus.
-Pagrindinis dėmesys bus skiriamas paaiškinimui, kaip vykdomi sandoriai ir kokie rezultatai gaunami naudojant skirtingus metodus.
+Skyriuje siekiama nuodugniai pažvelgti į automatizuoto roboto metodiką bei roboto kūrimo ir taikytų strategijų rezultatus.
+Pagrindinis dėmesys bus skiriamas paaiškinimui, kaip kuriamas robotas, kaip atliekami sandoriai ir kokie rezultatai gaunami naudojant skirtingas strategijas.
 
 \subsection{Metodika}
-Robotas yra parašytas naudojamas "python" programavimo kalbą. Yra keli pagrindiniai žingsniai roboto veikime
+Robotas parašytas "Python" programavimo kalbą naudojant "python-binance" API bendrauti su Binance testiniu tinklu. 
+Yra keli pagrindiniai žingsniai roboto veikime.
 
 \begin{enumerate}
-  \item Įkeliama konfigūracija ir simbolių duomenys iš failų, duomenys patikranami pagal validacijos schemas ir inicijuojami API prieigos ir klasės kintamieji.
-  \item Gaunami istoriniai simbolių "klines" duomenys ir išsaugojami naudojimui.
-  \item Skaičiuojama ARIMA prognozes simbolių porų kainoms arba skaičiuojama slankiuosius vidurkius (SMA) simbolių poroms pagal prekybos parametrus.
+  \item Įkeliama konfigūracija ir simbolių duomenys iš failų, duomenys patikrinami pagal validacijos schemas, inicijuojami API prieigos ir klasės kintamieji.
+  \item Gaunami istoriniai simbolių "klines" duomenys, kurie yra saugojami naudojimui.
   \item Siūlomas vartotojui sąveikos su prekybos robotu parinkčių meniu, pvz., likučių, pavedimų, pozicijų, simbolių informacijos spausdinimas ir pavedimų atšaukimas.
-  \item Robotas bando atlikti sandorius, jei tenkinamos tam tikros sąlygos, pavyzdžiui, jei trumpasis SMA kerta virš ilgojo SMA, t.y. strategija tenkina sąlygas.
-  \item Jeigu įvykdoma transakcija, jį išsaugojama žurnale.
-  \item Išsaugo porų duomenis, kai vartotojas išeina iš programos.
+  \item [4a.] Vykdomas meniu pasirinkimas
+  \item [4b.] Skaičiuojamos taikomos strategijos prognozės ir robotas bando atlikti sandorius, jei sąlygos ir tenkinamos.
+  \item [4c.] Išsaugo kriptovaliutų porų pozicijas, kai vartotojas išeina iš programos.
 \end{enumerate}
 
-Tai yra trumpa ir bendra metodika visais atvejais.
-\subsection{Rezultatai}
+Pagrindinės būsena yra 3, kai robotas laukia įvesties iš vartotojo arba laukia kol pasibaigs nustatytas prekiavimo laikas, tuomet pereis į vieną iš 4 būsenų, arba bus vykdoma, 
+meniu pasirinkimas, pvz. spausdinti dabartinį balansą arba bus bandoma atlikti prekybą arba tiesiog baigti darbą. Toliau apie visą eigą plačiau poskyriuose.
 
-Toliau robotui sandoriams atlikti pasirinktos šios kriptovaliutų poros 
-\begin {itemize}
-\item BTC/BUSD
-\item LTC/BUSD
-\item XRP/BUSD
-\item BNB/BTC
-\item ETH/BTC
-\end {itemize}
-Šios poros yra populiarios ir dažnai prekiaujamos tinkle, todėl jomis bus paprasčiau naudotis. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.5\textwidth]{img/main_states.png}
+  \label{fig:main_states}
+  \caption{Pagrindinės būsenos}
+\end{figure}
+
+\subsubsection{Validacija}
+Darbo pradžia - vykdoma validacija, kuri patikrina ar konfigūracija yra teisinga ir galima toliau prekiauti robotui - t.y.
+porų duomenis yra tvarkingi, pasirinkta egzistuojanti strategija ir pateikti jai reikalingi kintamieji, pasirinktas prekiavimo intervalas bei kiti kintamieji.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.5\textwidth]{img/validacija.png}
+  \label{fig:validation_flowchat}
+  \caption{Validacijos struktūrinė schema}
+\end{figure}
+
+
+\subsubsection{Meniu}
+Robotui sėkmingai įvykdžius validaciją sutinkamas meniu, kuriame galima atlikti vartotojui reikalingas operacijas, tokias kaip pasižiūrėti valiutų balansą,
+pažiūrėti įvykdytus sandorius ar tiesiog baigti darbą.
+
+Galimi pasirinkimai pradėjus roboto darbą.
+\begin{enumerate}
+  \item Spausdinti paskyros balansą.
+  \item Spausdinti simbolių poros sandorius.
+  \item Spausdinti dabartines kriptovaliutų porų pozicijas.
+  \item Spausdinti sandorį pagal ID.
+  \item Atšaukti sandorį rankiniu būdu.
+  \item Išsaugoti simbolio sandorių grafiką.
+  \item[9.] Spausdinti meniu.
+  \item[0.] Baigti darbą.
+  \item[-1.] Bandyti atlikti sandorius (Numatyta meniu parinktis pasibaigus laukimo laikui).
+\end{enumerate}
+
+Robotui prireikia minimalios vartotojo sąsajos, kad būtų galima sekti progresą ir atliktus darbus.
+Galima pasižiūrėti paskyros balansą ar atšaukti rankiniu būdu sandorį. Šios komandos praverčia atliekant sandorius, kurie gali būti atliekami ne iš karto. Taip pat patogu
+gauti duomenys iš API, kad sužinoti kokie sandoriai kokiu laiku būdu buvo vykdomi, taip nereikia saugoti žurnale šios informacijos. Vienintelis minusas, jog nebus aišku,
+kokia strategija buvo taikyta, kadangi tai yra šios programos implementacijos reikalas. Šis meniu yra visada matomas vartotojo. 
+Jeigu nepasirinkta jokia operacija, po nustayto laiko, robotas automatiškai pasirenka paskutinį variantą ir bando atlikti sandorius.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.5\textwidth]{img/meniu.png}
+  \label{fig:meniu_flowchart}
+  \caption{Meniu schema}
+\end{figure}
+
+\subsubsection{Prekyba}
+Robotui sėkmingai pradėjus darbą ir praėjus laiko tarpui po kurio robotas pradeda bandyti prekiauti, bandoma atlikti pagrindinį žingsnį - prekybą.
+Pagrindiniai žingsniai yra tokie:
+\begin{itemize}
+  \item Skaičiuojama ARIMA prognozė arba skaičiuojamos trumpojo ir ilgojo vidurkio vertes, pagal pasirinktą strategiją.
+  \item Tikrinamos sąlygos pagal apskaičiuotas vertes.
+  \item Jeigu sąlygos tinkamos bandoma atlikti sandorį, kitu atveju grįžtama į meniu ir vėl laukiama kada reikės bandyti atlikti sandorį su naujesniais duomenimis.
+  \item Jeigu reikia atlikti sandorį, jį bandoma atlikti. Bet sandoris nevisada gali pavykti, ypač jei norima pirkti nustatytą kainą, sandoris gali būti neįvykdomas, todėl dar bandoma jį kartoti.
+  \item Jei sandoris pavyko, grįžtama į meniu būseną kur vėl robotas yra laukimo būsenoje.
+\end{itemize}
+
+Taigi procesas gana paprastas - atnaujinami duomenis ir bandomas atlikti sandoris, jei sąlygos yra tenkinamos. Taip pat jeigu sandoris nepavyksta, sandorį
+dar bandoma po nustatyto laukimo laiko pakartoti kelis kartus pagal nustatymus. Tai praverčia jeigu norima prekiauti nustatytą kainą, o ne tokia kokią Siūlo 
+rinka, bet kitais atvejais sandoris taip ir gali nepavykti, nes niekas nepriima tokios kainos ir sandoris bus neįvykdytas pagal turimas prognozes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.5\textwidth]{img/prekyba.png}
+  \label{fig:trade_flowchart}
+  \caption{Prekybos struktūrinė schema}
+\end{figure}
+
+
 \subsection{Strategijos}
 \subsubsection{Tendencijos sekimas}
 
@@ -586,15 +648,16 @@ Pagal šią strategiją, jei dabartinė kaina yra didesnė už istorinį vidurk�
 Tikslas - pasinaudoti rinkos tendencija grįžti prie vidurkio.
 
 \begin {itemize}
-\item Apskaičiuojama kriptovaliutos pastarųjų 5 ir 15 intervalų (15 minučių) paprastą slenkantį vidurkį (SMA).
-\item Jei 5 intervalų SMA yra didesnis nei 15 intervalų SMA, bandoma parduoti kriptovaliutą.
-\item Jei 5 intervalų SMA yra mažesnis nei 15 intervalų SMA, bandoma pirkti kriptovaliutą.
+\item Apskaičiuojama kriptovaliutos pastarųjų trumpojo ir ilgojo intervalų paprastą slenkantį vidurkį (SMA).
+\item Jei trumpasis SMA yra didesnis nei ilgasis SMA - bandoma parduoti kriptovaliutą.
+\item Jei trumpasis SMA yra mažesnis nei ilgasis SMA - bandoma pirkti kriptovaliutą.
 \item Nuolat stebima kriptovaliutos kaina ir atitinkamai atnaujinami SMA.
 \end {itemize}
 
 Strategija grindžiama idėja, kad kai kriptovaliutos kaina nukrypsta nuo vidutinės vertės, ji ilgainiui grįš į vidutinę. Šiuo atveju vidurkį atstoja kainos paprastasis slankusis vidurkis (SMA),
 o nuokrypis nuo vidurkio nustatomas lyginant trumpalaikį SMA ir ilgalaikį SMA. Jei trumpalaikis SMA yra didesnis nei ilgalaikis SMA, tada daroma prielaida, kad kaina nukrypsta nuo vidurkio
 ir galiausiai grįš, todėl bandoma atlikti pardavimą. Ir atvirkščiai, jei trumpalaikis SMA yra mažesnis už ilgalaikį SMA, tada pateikiamas pirkimo pavedimas, numatant, kad kaina grįš į vidutinę.
+Šioje programoje, galima pasirinkti kiek pastarųjų verčių kainų vidurkį skaičiuoti trumpajam ir ilgajam SMA.
 
 
 \subsection{Prekybos rezultatai}
