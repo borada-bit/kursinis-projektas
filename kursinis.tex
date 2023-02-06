@@ -739,9 +739,92 @@ kintamųjų ir strategija pakeičiama į "TENDENCY\_ARIMA"
 \end{verbatim}
 
 \subsubsection{Prekybos realizacija}
+Robotas skirtas analizuoti rinkos tendencijas ir priimti pagrįstus sprendimus, kada pirkti ir parduoti kriptovaliutas. 
+Kad tai pasiektų, robotas naudoja ARIMA analizę ir paprastą slenkantį vidurkį (SMA).
+Šios technikos leidžia robotui nuolat stebėti rinkos sąlygas ir sudaryti sandorius remiantis realaus laiko duomenimis. 
+Ištirsime, kaip robotas integruoja šias strategijas ir procesą, kuriuo jis pateikia pavedimus ir vykdo sandorius.
+
+Programos pradžioje, praėjus validacijai ir inicializacijai, kodas patikrina, kokia prekybos strategija pasirinkta ir pagal tai atlieka reikiamus skaičiavimus. Jei pasirenkama MEAN\_STRATEGY, nuskaitoma istorines kriptovaliutos kainas (tiek pastarųjų verčių koks ilgojo slankaus vidurkio parametras) ir apskaičiuoja trumpąjį ir ilgąjį paprastąjį slankųjį vidurkį (SMA). Jei pasirinkta TENDNCY\_ARIMA, ji nuskaito pastarųjų 1000 intervalo "candlesticks" eilučių duomenis ir apskaičiuoja ARIMA prognozę.
+\begin{python}
+if self._strategy == MEAN_STRATEGY:
+    self._get_historic_prices(limit=self._long_term)
+    self._calculate_sma()
+elif self._strategy == TENDENCY_STRATEGY:
+    self._get_klines_as_df(limit=1000)
+    self._calculate_arima()
+\end{python}
+
+Toliau, kai praeina nustatytas "timeout" laikas, programa kviečia \_try\_trade funkciją , kuri vykdo atitinkamą prekybos strategiją priklausomai nuo strategijos. Abi strategijos atnaujina savo duomenis, išmesdama seniausia verte ir pridedama
+naujausia kainos vertę, tuomet pagal strategija atliekami SMA arba ARIMA skaičiavimai ir bandoma atitinkamai atlikti 
+užsakymą.
+
+\begin{python}
+def _try_trade(self) -> None:
+	klines = 1
+	if self._strategy == MEAN_STRATEGY:
+		self._get_historic_prices(klines)
+		self._calculate_sma()
+		self._trade_sma()
+	elif self._strategy == TENDENCY_STRATEGY:
+		self._get_klines_as_df(klines)
+		self._calculate_arima()
+		self._trade_arima()
+\end{python}
+
+Šis kodo blokas gauna vidutinę konkretaus simbolio kainą rinkoje jeigu yra nustatytas "LIMIT" užsakymo tipas ir atlieka sandorius pagal strategiją. Patikrinama, ar trumpalaikis SMA didesnis už ilgalaikį SMA ir ar esama pozicija yra pirki, o jei tenkinamos abi sąlygos, pateikia užsakymą parduoti nurodytą simbolio kiekį už apskaičiuotą vidutinę kainą. Jei trumpalaikis SMA yra mažesnis už ilgalaikį SMA, o dabartinė pozicija yra parduoti, pateikiamas užsakymas pirkti nurodytą simbolio kiekį. Atlikus sandorį, padėtis atnaujinama, kad atspindėtų naują būseną. Analogiškai vyksta ir tendencijos strategijoje - tikrinama ar ARIMA prognozuojama kainą yra didesnę ar mažesnę už dabartinę vidutinę kainą ir atitinkamai atliekamas užsakymas.
+
+\begin{python}
+    price = None
+    if config['order_type'] == Client.ORDER_TYPE_LIMIT:
+        price = self._get_symbol_avg_price(symbol)
+    if short_sma > long_sma and position == 'BUY':
+        if self._make_order(symbol, position, config['trade_quantity'], price):
+            config['position'] = 'SELL'
+    elif short_sma < long_sma and position == 'SELL':
+        if self._make_order(symbol, position, config['trade_quantity'], price):
+            config['position'] = 'BUY'
+\end{python}
+
+Funkcija \_make\_order naudojama norint atlikti konkretaus simbolio užsakymą su nurodyta puse (pirkti arba parduoti), kiekiu ir kaina. Naudojama „create\_order“ metodą iš „Binance“ API ir nustato simbolio parametrus remiantis konfigūracija.
+
+Funkcija turi pakartotinio bandymo mechanizmą, kad kelis kartus būtų bandoma pateikti užsakymą, jei atsiranda klaidų arba užsakymas būtų atmestas. Pakartotinių bandymų kintamasis nustatomas į 0 ir didėja 1 po kiekvieno nesėkmingo bandymo. Jei pakartojimų skaičius viršija ORDER\_MAX\_RETRIES (prekybos atveju šis kintamasis yra - 3), funkcija grąžins False, nurodydama, kad užsakymas nebuvo baigtas.
+
+Po kiekvieno bandymo funkcija laukia tam tikrą laiką, apibrėžtą ORDER\_RETRY\_WAIT\_TIME (prekybos atveju šis kintamasis yra - 10), prieš bandydama dar kartą. Jei užsakymas bus užpildytas, atsakymo būsena bus „FILLED“, o funkcija grąžins True, nurodydama, kad užsakymas įvykdytas sėkmingai.
+
+\begin{python}
+def _make_order(self, symbol: str, side: str, qty: float, price: float = None) -> bool:
+        # Retry is useful if order type is LIMIT
+        retries = 0
+        order_completed = False
+        while not order_completed and retries < ORDER_MAX_RETRIES:
+            try:
+                response = self._client.create_order(
+                    symbol=symbol,
+                    side=side,
+                    type=self._pairs_config[symbol]['order_type'],
+                    quantity=qty,
+                    price=price,
+                    timeInForce=self._pairs_config[symbol]['time_in_force'],
+                )
+                print(f"{response['side']} {response['type']} {response['symbol']} {response['status']}")
+                if response['status'] == Client.ORDER_STATUS_FILLED:
+                    order_completed = True
+                    break
+            except exceptions.BinanceOrderException as e:
+                print(e.message)
+            retries += 1
+            time.sleep(ORDER_RETRY_WAIT_TIME)
+        return order_completed
+\end{python}
+
 
 \subsubsection{Prekybos rezultatai}
-BTCBUSD
+Prekybos rezultatų poskyris yra automatizuoto kriptovaliutų prekybos roboto veikimo įvertinimas. Šioje skiltyje bus vaizdžiai pavaizduoti prekybos strategijos, įgyvendintos naudojant grafikus ir diagramas, rezultatai. Roboto krepšelio pokytis bus lyginamas su pradiniu krepšeliu prieš pradedant prekybą. Šios dalies tikslas – įvertinti bendrą roboto pelningumą ir pateikti jo prekybos rezultatų analizę.
+
+Prekyba buvo atlikta naudojant abi aprašytas strategijas, ir palikus robotą dirbti nakties metu, bandant atlikti prekyba kas
+15 minučių.
+
+
 \begin{figure}[H]
   \centering
   \begin{subfigure}{.5\textwidth}
@@ -760,7 +843,6 @@ BTCBUSD
   \label{fig:btcbusd_trades}
 \end{figure}
 
-ETHBUSD
 \begin{figure}[H]
   \centering
   \begin{subfigure}{.5\textwidth}
@@ -779,7 +861,6 @@ ETHBUSD
   \label{fig:ethbusd_trades}
 \end{figure}
 
-LTCBUSD
 \begin{figure}[H]
   \centering
   \begin{subfigure}{.5\textwidth}
@@ -798,7 +879,10 @@ LTCBUSD
   \label{fig:ltcbusd_trades}
 \end{figure}
 
-Gauti rezultatai robotui prekiaujant pritaikius anksčiau minėtas strategijas.
+Gauti rezultatai robotui prekiaujant pritaikius anksčiau minėtas strategijas. Kaip matome robotas dažnai bando atlikti pakartotinus užsakymus dėl nustatyto "LIMIT" užsakymo tipo ir galiausiai ne visada užsakymas pavyksta. Pastebima, kad 
+grįžimo prie vidurkio strategija, atlieka žymiai mažiau bandymų prekiauti lyginant su tendencijos sekimu. Bendrai paėmus
+visos su visomis poros buvo atlikta nors vienas pirkimas ir pardavimas. Taip pat pastebima, jog šios kriptovaliutos turi 
+labai panašią grafiko tendenciją 
 
 \begin{table}[H]
   \centering
@@ -814,6 +898,10 @@ Gauti rezultatai robotui prekiaujant pritaikius anksčiau minėtas strategijas.
   \caption{Prekybos rezultatai}
   \label{table:preykos_rezultatai}
 \end{table}
+
+Tendencijos sekimo strategija atneše šiek tiek pelno po nakties prekybos. Tai galimai įtakoja didesnis atliktų prekybos kiekis, nes bandoma tiesiog pasipelnyti iš tendencijos į kurią kryptį keliaujama. Grįžimo prie vidurkio strategija atliko 
+mažai užsakymų ir atnešė labai maža nuostolį. Ši strategija galbūt nėra pats geriausias pasirinkimas trumpalaikiui prekiavimui
+tokioje aplinkoje.
 
 % Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
 % suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
