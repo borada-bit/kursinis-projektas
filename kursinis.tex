@@ -622,25 +622,29 @@ rinka, bet kitais atvejais sandoris taip ir gali nepavykti, nes niekas nepriima 
 \subsection{Strategijos}
 \subsubsection{Tendencijos sekimas}
 
-Šiuo atveju vykdoma strategija yra standartinė pirkimo ir laikymo strategija. Robotas naudoja ARIMA, kad sudarytų pasirinktų kriptovaliutų porų kainos prognozes. 
-Kai prognozė numato kylančią kainą, robotas įvykdys pirkimo pavedimą, o prognozei numatant mažėjančią kainą robotas vykdys pardavimo pavedimą. 
-Šio tipo strategija paremta idėja, kad galima pasipelnyti iš rinkos tendencijų perkant pigiai ir parduodant brangiai.
-Robotas naudoja ARIMA, kad analizuotų istorinius kainų duomenis ir prognozuotų būsimus kainų pokyčius, kuriuos jis naudoja priimdamas pirkimo ir pardavimo sprendimus.
-Vadovaudamasis šia strategija, robotas siekia pasinaudoti rinkos tendencijomis. 
+Ši strategija paremta idėja, kad galima pasipelnyti iš rinkos tendencijų perkant pigiai ir parduodant brangiai\cite{hurst2017century}. Strategija teigia, kad rinkos linkusios laikyti
+tendenciją tam tikra kryptimi. Nustatant ir stebint šias tendencijas investuotojai gali pasinaudoti rinkos pokyčiais ir uždirbti.
 
+Robotui taikyti šią strategiją atliekami žingsniai:
 \begin {itemize}
 \item ARIMA prognozuoja kriptovaliutos kainą.
 \item Remiantis prognoze, jei modelis numato didėjimo tendenciją, bandoma nusipirkti kriptovaliutą, o jei prognozuoja mažėjimo tendenciją, bandoma kriptovaliutą parduoti.
 \item Nuolat stebima kriptovaliutos kainą ir atitinkamai atnaujinamas ARIMA modelis, kad būtų atnaujintos prognozes.
 \end{itemize}
 
+Šiuo atveju vykdoma strategija yra standartinė pirkimo ir laikymo strategija. Robotas naudoja ARIMA, kad sudarytų pasirinktų kriptovaliutų porų kainos prognozes. 
+Kai prognozė numato kylančią kainą, robotas įvykdys pirkimo pavedimą, prognozei numatant mažėjančią kainą robotas vykdys pardavimo pavedimą.
+Robotas naudoja ARIMA, kad analizuotų istorinius kainų duomenis ir prognozuotų būsimus kainų pokyčius, kuriuos jis naudoja priimdamas pirkimo ir pardavimo sprendimus.
+Vadovaudamasis šia strategija, robotas siekia pasinaudoti rinkos tendencijomis. 
+
 \subsubsection{Grįžimas prie vidurkio}
 
-Grįžimas prie vidurkio yra prekybos strategija, pagrįsta idėja, kad kainos laikui bėgant grįžta į savo vidurkį. 
+Grįžimas prie vidurkio yra prekybos strategija, pagrįsta idėja, kad kainos laikui bėgant grįžta į savo vidurkį \cite{voltaprofitable}. 
 Tai apima dabartinės kainos palyginimą su istorine vidutine kaina. Sandoris yra sudaromas pagal tai, ar dabartinė kaina yra didesnė ar mažesnė už vidutinę.
 Pagal šią strategiją, jei dabartinė kaina yra didesnė už istorinį vidurkį, prekiautojas parduotų turtą, o jei ji yra mažesnė, prekiautojas pirktų. 
 Tikslas - pasinaudoti rinkos tendencija grįžti prie vidurkio.
 
+Robotui taikyti šią strategiją atliekami žingsniai:
 \begin {itemize}
 \item Apskaičiuojama kriptovaliutos pastarųjų trumpojo ir ilgojo intervalų paprastą slenkantį vidurkį (SMA).
 \item Jei trumpasis SMA yra didesnis nei ilgasis SMA - bandoma parduoti kriptovaliutą.
@@ -648,10 +652,10 @@ Tikslas - pasinaudoti rinkos tendencija grįžti prie vidurkio.
 \item Nuolat stebima kriptovaliutos kaina ir atitinkamai atnaujinami SMA.
 \end {itemize}
 
-Strategija grindžiama idėja, kad kai kriptovaliutos kaina nukrypsta nuo vidutinės vertės, ji ilgainiui grįš į vidutinę. Šiuo atveju vidurkį atstoja kainos paprastasis slankusis vidurkis (SMA),
-o nuokrypis nuo vidurkio nustatomas lyginant trumpalaikį SMA ir ilgalaikį SMA. Jei trumpalaikis SMA yra didesnis nei ilgalaikis SMA, tada daroma prielaida, kad kaina nukrypsta nuo vidurkio
-ir galiausiai grįš, todėl bandoma atlikti pardavimą. Ir atvirkščiai, jei trumpalaikis SMA yra mažesnis už ilgalaikį SMA, tada pateikiamas pirkimo pavedimas, numatant, kad kaina grįš į vidutinę.
-Šioje programoje, galima pasirinkti kiek pastarųjų verčių kainų vidurkį skaičiuoti trumpajam ir ilgajam SMA.
+Šiuo atveju vidurkį atstoja kainos paprastasis slankusis vidurkis (SMA), o nuokrypis nuo vidurkio nustatomas lyginant trumpalaikį SMA ir ilgalaikį SMA.
+Jei trumpalaikis SMA yra didesnis nei ilgalaikis SMA, tada daroma prielaida, kad kaina nukrypsta nuo vidurkio
+ir galiausiai grįš, todėl bandoma atlikti pardavimą. Ir atvirkščiai, jei trumpalaikis SMA yra mažesnis už ilgalaikį SMA, tada pateikiamas pirkimo pavedimas, numatant, 
+kad kaina grįš į vidutinę.
 
 
 \subsection{Realizacija}
