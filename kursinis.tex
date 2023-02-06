@@ -10,8 +10,32 @@
 % \usepackage{hyperref}  % Nuorodų aktyvavimas
 \usepackage{url}
 \usepackage{subcaption}	% package for subfigures
-\usepackage{tabularx}
+\usepackage{tabularx} % package for better figure width in document
 \usepackage{pythonhighlight}
+\usepackage{listings} % package for JSON
+
+\lstdefinestyle{jsonstyle}{
+  language=JSON,
+  basicstyle=\ttfamily,
+  keywordstyle=\color{blue}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  commentstyle=\color{gray}\ttfamily,
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{white},
+  frame=tb,
+  tabsize=4,
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=true,
+  title=\lstname,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  keepspaces=true,
+}
 
 % Titulinio aprašas
 \university{Vilniaus universitetas}
@@ -495,7 +519,7 @@ XRPBUSD
     \caption{SARIMA modelis}
     \label{fig:xrpbusd_sarima}
   \end{subfigure}
-  \caption{LTCBUSD prognozavimas}
+  \caption{XRPBUSD prognozavimas}
   \label{fig:xrpbusd}
 \end{figure}
 
@@ -660,25 +684,145 @@ ir galiausiai grįš, todėl bandoma atlikti pardavimą. Ir atvirkščiai, jei t
 Šioje programoje, galima pasirinkti kiek pastarųjų verčių kainų vidurkį skaičiuoti trumpajam ir ilgajam SMA.
 
 
-\subsection{Prekybos rezultatai}
+\subsection{Realizacija}
+
+Toliau robotui sandoriams atlikti pasirinktos šios kriptovaliutų poros 
+\begin {itemize}
+\item BTC/BUSD
+\item ETH/BUSD
+\item LTC/BUSD
+\end {itemize}
+Šios poros yra populiarios ir dažnai prekiaujamos tinkle, todėl jomis bus paprasčiau naudotis. Kadangi tinklas yra testinis, didžiausios prekybos apimties sulaukia
+tik populiariausios kriptovaliutos.
+
+\subsubsection{Konfigūracija}
+Naudojamų porų konfigūracija prekiauti kriptovaliutų poromis. Pasirenkama kiekis po kiek prekiauti, pirkimo ar pardavimo pozicija, koks yra užsakymo
+tipas ("LIMIT" arba "MARKET" ) ir jeigu tipas yra "LIMIT" pasirinkti užsakymo reikšmę: "FOK", "IOC" arba "GTC". Žemiau pateikta konfigūracija naudojama 
+prekiauti abiejomis strategijomis.
+
+\begin{verbatim}
+  {
+  "BTCBUSD": {
+    "trade_quantity": 0.01, # Kiekis kuriuo prekiaujama
+    "position": "BUY", # Dabartinė pozicija
+    "order_type": "LIMIT", # Užsakymo tipas (LIMIT arba MARKET)
+    "time_in_force": "FOK" # LIMIT nustatymas (FOK, GTC arba IOC)
+  },
+  "ETHBUSD": {
+    "trade_quantity": 0.1,
+    "position": "BUY",
+    "order_type": "LIMIT",
+    "time_in_force": "FOK"
+  },
+  "LTCBUSD": {
+    "trade_quantity": 1,
+    "position": "BUY",
+    "order_type": "LIMIT",
+    "time_in_force": "FOK"
+  }
+\end{verbatim}
+
+Taip pat yra dar vienas konfigūracijos failas kuriame įrašoma API prieigos raktai, strategija, prekybos laikas ir kokio intervalo duomenis naudoti. Žemiau pateika 
+strategija buvo naudojama prekiauti "Grįžimo prie vidurkio" strategijai. "Tendencijos sekimo" strategijai viskas tas pats, tik nebelieka "long\_term" ir "short\_term"
+kintamųjų ir strategija pakeičiama į "TENDENCY\_ARIMA" 
+
+\begin{verbatim}
+{
+  "api_key": "key", # API prieigos raktas
+  "api_secret": "s3cr3t", # API prieigos slaptas raktas
+  "timeout": 900, # Kas kiek laiko bandyti prekiauti
+  "interval": "15m", # Kokio intervalo duomenis naudoti
+  "strategy": "MEAN_SMA", # Strategija (MEAN_SMA arba TENDENCY_ARIMA)
+  "long_term": 15, # MEAN_SMA strategijos ilgojo slankaus vidurkio parametras
+  "short_term": 5 # MEAN_SMA strategijos trumpojo slankaus vidurkio parametras
+}
+\end{verbatim}
+
+\subsubsection{Prekybos realizacija}
+
+\subsubsection{Prekybos rezultatai}
+BTCBUSD
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\linewidth]{img/2023-02-04 00:34:57_BTCBUSD_graph.png}
-  \label{fig:robot_btcbusd}
-  \caption{Roboto prekyba BTCBUSD}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{img/BTCBUSD_ARIMA_trades.png}
+    \caption{Tendencijos sekimas}
+    \label{fig:btcbusd_arima_trades}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{img/BTCBUSD_SMA_trades.png}
+    \caption{Grįžimas prie vidurkio}
+    \label{fig:btcbusd_sma_trades}
+  \end{subfigure}
+  \caption{BTCBUSD prekyba}
+  \label{fig:btcbusd_trades}
 \end{figure}
 
+ETHBUSD
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{img/ETHBUSD_ARIMA_trades.png}
+    \caption{Tendencijos sekimas}
+    \label{fig:ethbusd_arima_trades}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{img/ETHBUSD_SMA_trades.png}
+    \caption{Grįžimas prie vidurkio}
+    \label{fig:ethbusd_sma_trades}
+  \end{subfigure}
+  \caption{ETHBUSD prekyba}
+  \label{fig:ethbusd_trades}
+\end{figure}
+
+LTCBUSD
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{img/LTCBUSD_ARIMA_trades.png}
+    \caption{Tendencijos sekimas}
+    \label{fig:ltcbusd_arima_trades}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{img/LTCBUSD_SMA_trades.png}
+    \caption{SMA strategija}
+    \label{fig:ltcbusd_sma_trades}
+  \end{subfigure}
+  \caption{LTCBUSD prekyba}
+  \label{fig:ltcbusd_trades}
+\end{figure}
 
 Gauti rezultatai robotui prekiaujant pritaikius anksčiau minėtas strategijas.
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\linewidth}{|X|X|X|X|}
+    \hline
+    Strategija             & Krepšelio pokytis \\
+    \hline
+    Tendencijos sekimas    & +5.54 BUSD        \\
+    \hline
+    Grįžimas prie vidurkio & -0.32 BUSD        \\
+    \hline
+  \end{tabularx}
+  \caption{Prekybos rezultatai}
+  \label{table:preykos_rezultatai}
+\end{table}
 
 % Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
 % suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
 \section{Išvados}
-Sukurtas robotas gebantis prekiauti kriptovaliutomis.
+Taigi apibendrinant šiame darbe atlikti keli dalykai
 \begin{itemize}
   \item atlikta autoregresinių modelių analizė,
   \item parinkta naudoti ARIMA modelį prognozėmis,
-  \item sukurtas robotas gebantis prekiauti remantis ARIMA prognozėmis
+  \item sukurtas robotas gebantis prekiauti remiantis strategijomis testiniame tinkle
 \end{itemize}
 
 Neišvengiama, jog tokiame trumpame darbe būtų aptartos visos įmanomos sritys ir atvejai, taigi tolimesnei tyrimo eigai pasiūlymas nagrinėti kitus modelius
@@ -696,12 +840,22 @@ siekti numatyti būsimas akcijų kainas, remiantis ankstesniais rezultatais.
 \textbf{Euristinis algoritmas} - euristiniai algoritmai yra tokios intelektualios optimizavimo uždavinių sprendimo priemonės, kuriomis siekiama rasti aukštos
 kokybės (bet nebūtinai optimalius) sprendinius per priimtiną laiką. Algoritmas negarantuoja, kad rastas sprendimas bus optimalus. \cite{misevivcius2009euristiniku}
 
+\textbf{FOK} - "Fill or Kill" - limitinis sandorio tipas kai už norimą kainą, atlikti sandorį tik jei jis yra pilnai įvykdomas.
+
+\textbf{GTC} - "Good til cancelled" - limitinis sandorio tipas kai už norimą kainą, sandoris yra paliekamas rinkoje iki tol kol pilnai įvykdomas arba rankiniu būdu atšaukiamas.
+
+\textbf{IOC} - "Immediate or cancel" - limitinis sandorio tipas kai už norimą kainą, sandoris yra atliekamas tik tada jei nors dalis sandorio yra iškarto įvykdoma.
+
 \textbf{Kriptovaliuta} - Kriptovaliuta yra skaitmeninė arba virtuali valiuta, kuri yra apsaugota kriptografija, todėl beveik neįmanoma jos padirbti ar išleisti dvigubai.
 
 \textbf{Kriptovaliutų pora} - Kriptovaliutų pora rinkoje yra naudojama prekiaujant. Kriptovaliutos yra susietos poromis, norint nusipirkt BTC valiutos pirmiausia reikia surasti 
 galimus keitimo variantus, jei egzistuoja pora BTC/BUSD, galima nusipirkti BTC kriptovaliutos uz turimas BUSD valiutas. Dažnu atveju rinkoje pasidėjus ("FIAT") valiuta
 prekybos rinką ją konvertuoją i panašią valiuta kaip BUSD, USDT ar BNB.
 prekybos rinką ją konvertuoją i panašių token valiuta kaip BUSD(us -regulated stablecoin), USDT (usd tether) ar BNB (binance coin)
+
+\textbf{LIMIT užsakymas} - Prekybos rinkoje bandomas atlikti užsakymas su vartotojo nustatyta kaina.
+
+\textbf{MARKET užsakymas} - Prekybos rinkoje atliekamas užsakymas automatiškai gaunant geriausia siūloma kainą rinkoje tuo metu.
 
 \textbf{MSE} - Vidutinė kvadratinė paklaida, angl. (Mean squared error)
 
