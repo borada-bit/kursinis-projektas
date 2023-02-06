@@ -2,7 +2,8 @@ generuoti:
 	xelatex kursinis.tex
 	biber kursinis
 	xelatex kursinis.tex
-	open kursinis.pdf || xdg-open kursinis.pdf
+	mv kursinis.pdf MatasKaminskasKDP2023.pdf
+	open MatasKaminskasKDP2023.pdf || xdg-open MatasKaminskasKDP2023.pdf
 
 ubuntu:
 	echo "Diegiamas LaTeX (PdfLaTeX, XeTeX ir kt.)"
