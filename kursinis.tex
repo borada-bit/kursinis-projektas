@@ -292,63 +292,66 @@ D - sezoniškumo diferencijavimo laipsnis, Q - sezoniškumo slankiojo vidurkio l
 \section{Prognozių metodika}
 
 Skyriuje aprašomi žingsniai, kurių buvo imtasi atliekant tyrimus ir analizę kuriant automatizuotą kriptovaliutų prekybos robotą. 
-Tyrimo metu pagrindinis dėmesys buvo skiriamas tinkamų kriptovaliutų kainų analizės ir prognozavimo įrankiams ir metodams nustatyti bei skirtingų modelių veikimui įvertinti. 
-Duomenys buvo renkami iš Binance testavimo tinklo naudojant python-binance API, o duomenims pritaikyti statistinės ir laiko eilučių analizės metodai. 
-Kainų prognozavimui buvo naudojami autoregresyvūs modeliai, tokie kaip ARIMA ir SARIMA. 
+Tyrimo metu pagrindinis dėmesys buvo skiriamas prognozavimo įrankių ir metodų nustatymui, skirtingų modelių veikimų įvertinimui. 
 Šio tyrimo išvados yra vienas iš pagrindų kuriant prekybos robotą.
 
-\subsection{Modeliai}
-Prognozavimui bus naudojami ARIMA ir SARIMA modelis. Kadangi kriptovaliutų kainų duomenys nėra stacionarūs, todėl naudojamas ARIMA modelis, kuris gali taikyti diferencijavimą.
+Prognozavimui naudojami ARIMA ir SARIMA modelis. Kadangi kriptovaliutų kainų duomenys nėra stacionarūs, todėl naudojamas ARIMA modelis, kuris gali taikyti diferencijavimą.
 ARIMA naudoja anksčiau minėtus AR ir MA modelius, bei pritaiko diferencijavimą, taip galėdamas dirbti ir su nestacionariais duomenimis. 
 Jeigu laiko eilutė yra nestacionari ir bandoma naudoti AR, MA ir ARMA modelius, rezultatai galimai bus klaidingi arba netikslūs.
-Taip pat naudojamas SARIMA modelis, nes jis yra ARIMA modelio pratęsimas tiriantis sezoniškumą laiko eilutėje, todėl dar bus patikrinama ar duomenyse egzistuoja sezoniškumas
+Taip pat naudojamas SARIMA modelis, nes jis yra ARIMA modelio pratęsimas tiriantis sezoniškumą laiko eilutėje, todėl dar bus patikrinama ar rinkinyje egzistuoja sezoniškumas
 galintis padėti prognozuoti.
 
-% since network is test, used highest volatility pairs
 \subsection{Duomenys}
-Istoriniai duomenys "Candlesticks" surinkti iš Binance testavimo tinklo naudojant python-binance API. Kadangi testinis tinklas kiekvieną mėnesį automatiškai 
+Istoriniai duomenys "Candlesticks" surenkami iš Binance testavimo tinklo naudojant python-binance API. Kadangi testinis tinklas kiekvieną mėnesį automatiškai 
 išvalo visus duomenis, imami 2023m. sausio 4d. duomenys savaitei į priekį, todėl verta paminėti, kad šie duomenys galioja tik tam tikrą laikotarpį. 
-Kadangi tinklas yra testinis, jame prekiaujama nevisomis galimomis kriptovaliutų poromis. Iš viso yra 20 skirtingų porų tinkle. Pasirinkta tirti šias poras: 
+Kadangi tinklas yra testinis, jame prekiaujama nevisomis galimomis kriptovaliutų poromis. Pasirinkta tirti šias poras: 
 i) BTC/BUSD, ii) LTC/BUSD, iii) XRP/BUSD.
-Gaunamuose duomenyse yra daugiau informacijos bet bus naudojama tik datos ir `close' stulpelis, parodantis konkrečios kriptovaliutos uždarymo kainą tam tikru laiku. Tai yra paskutinė 
-kaina, už kurią buvo prekiaujama tam tikru laikotarpiu, pavyzdžiui, valandą ar dieną. Uždarymo kaina yra svarbi, nes ji atspindi galutinę kainą, už kurią pirkėjai ir pardavėjai
-sutarė prekiauti kriptovaliuta. Duomenys bus naudojami tokie kokie yra ir iškarto perduodami į modelius. Modeliui apmokyti naudojamas 90 procentų dumomenų rinkinio dydis.
+Gautuose duomenyse yra daugiau informacijos, bet bus naudojama tik datos ir uždarymo kainos stulpelis, parodantis konkrečios kriptovaliutos uždarymo kainą tam tikru laiku. 
+Uždarymo kaina yra svarbi, nes ji atspindi galutinę kainą, už kurią pirkėjai ir pardavėjai sutarė prekiauti kriptovaliuta. 
+Duomenys bus naudojami tokie kokie yra ir iškarto perduodami į modelius. Modeliui apmokyti naudojamas 90 procentų dumomenų rinkinio dydis.
 Kitus 10\% bandoma prognozuoti po vieną reikšmę į priekį. Modeliui atlikus prognozė, jis yra iš naujo apmokomas pridėjus tikrąją sekančią vertę prie mokymo rinkinio ir
 taip vėl yra prognozuojama kitą reikšmė, jau su naujai apmokytu modeliu.
 
 % A detailed explanation of the model fitting process, including the specific parameters that you will be using for each of the AR models and any assumptions that you will be making.
-\subsection{Modelių implementavimas}
-Prognozuojant naudojamos ARIMA ir SARIMA pagalbinės bibliotekos\cite{seabold2010statsmodels} kuri aprašo šiuos modelius, 
+\subsection{Modeliai}
+Prognozuojant naudojama ARIMA ir SARIMA pagalbinė biblioteka\cite{seabold2010statsmodels}, kuri aprašo šiuos modelius, 
 bei euristins auto\_arima algoritmas\cite{pmdarima} padedantis nustatyti geriausius ARIMA ir SARIMA parametrus konkrečiam duomenų rinkiniui.
-SARIMA modeliui sezoniškumo intervalas naudojamas 4 - bandoma pamatyti ar atsiranda sezoniškumas kiekvieną valandą, nes duomenų intervalas yra 15min.
-Modelių vertinimui bus naudojama MSE ir MAPE paklaidos.
+SARIMA modeliui naudojamas sezoniškumo parametras yra \textbf{4} - bandoma pamatyti ar atsiranda sezoniškumas kiekvieną valandą, nes duomenų intervalas yra 15min.
 
 \subsection{Prognozavimas}
 
-Kriptovaliutų kainų prognozavimo metodas naudoja anksčiau minėtus modelius ir Binance testinio tinklo duomenis. 
-Žemiau matoma struktūrinę schemą, parodanti bendrą procesą, kurį sudaro keli pagrindiniai žingsniai. 
+Kriptovaliutų kainų prognozavimui žemiau matoma struktūrinę schemą (\textbf{2 pav.}), parodanti bendrą procesą. 
 Pirmas žingsnis yra duomenų gavimas is binance API, bet jų gaunama daugiau negu reikia, todėl atsirenkami tik reikalingi duomenys, šis žingsnis yra
-svarbus norint įsitikinti,kad duomenys yra paruošti analizei. Po to pasirenkame modelį (ARIMA/SARIMA).
+svarbus norint įsitikinti, kad duomenys yra paruošti analizei. Po to pasirenkamas modelis (ARIMA/SARIMA).
 Kitame žingsnyje yra gaunami geriausi parametrai konkrečiam duomenų rinkiniui ir modeliui, kad būtų optimalus veikimas. 
-Tada taikome modelį treniruočių duomenims, kad apmokyti modelį tolimesniam prognozavimui. 
-Po to modelis prognozuoja reikšmes ir jos yra saugomos, kad būtų galima palyginti su tikromis reikšmemis. Paskutinis žingsnis - palyginti gautus rezultatus
-ir išsaugoti duomenis grafe. Pateikta struktūrinė schema padės geriau suprasti visą procesą.
+Tada taikome modelį treniravimo duomenims, kad apmokyti modelį tolimesniam prognozavimui. 
+Po to modelis prognozuoja reikšmes ir jos yra saugomos, kad būtų galima palyginti su tikromis reikšmėmis. Paskutinis žingsnis - palyginti gautus rezultatus
+ir išsaugoti duomenis grafe.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{img/flowchart.png}
+  \includegraphics[width=.5\textwidth]{img/flowchart.png}
   \label{fig:forecast_flowchart}
-  \caption{Struktūrinė schema}
+  \caption{Prognozavimo struktūrinė schema}
+\end{figure}
+
+Taip pat struktūrine schema (\textbf{3 pav.}) pavaizduojama pagrindinė algoritmo mintis. Gauname tvarkingus testavimo duomenis, tada modelis yra apmokomas ir vykdoma viena prognozė į priekį.
+Atlikus prognozę, ji yra išsaugojama į prognozių sąrašą, o tikroji reikšmė pridedama prie treniravimo rinkinio. Taip atliekama iki tol kol baigiasi testavimo rinkinys.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.75\textwidth]{img/main_algo_flowchart.png}
+  \label{fig:forecast_inner_flowchart}
+  \caption{Prognozavimo algoritmo struktūrinė schema}
 \end{figure}
 
 \subsection{Vertinimas}
 
 Vidutinė kvadratinė paklaida (MSE) ir vidutinė absoliučioji procentinė paklaida (MAPE) yra dvi dažniausios metrikos, naudojamos prognozavimo modelių našumui įvertinti.
 MSE yra prognozuotų ir faktinių verčių vidutinio skirtumo kvadrato matas, o MAPE yra vidutinio procentinio skirtumo tarp numatytų ir faktinių verčių matas.
-Abu šie rodikliai gali būti naudingi lyginant ARIMA ir SARIMA prognozavimo kriptovaliutoms rezultatus.
-MSE yra gera metrika norint išmatuoti, kiek prognozės nukrypsta nuo faktinių verčių, mažesnė MSE reikšmė rodo tikslesnį modelį. 
-MAPE yra gera metrika prognozavimo paklaidoms procentais matuoti, mažesnė MAPE reikšmė rodo tikslesnį modelį.
-Abi šios metrikos gali būti naudojamos vertinant modelių veikimą ir lyginant ARIMA ir SARIMA prognozavimo kriptovaliutoms rezultatus.
+Abu šie rodikliai gali būti naudingi lyginant ARIMA ir SARIMA prognozavimo kriptovaliutoms rezultatus, mažesnes rodiklių reikšmės rodo tikslesnį modelį.
+MSE yra gera metrika norint išmatuoti, kiek prognozės nukrypsta nuo faktinių verčių. MAPE yra gera metrika prognozavimo paklaidoms procentais matuoti.
+Abi šios metrikos gali būti naudojamos vertinant modelių veikimą, lyginant ARIMA ir SARIMA prognozavimo rezultatus.
 
 % An evaluation of the performance of your models against the actual crypto prices, and a discussion of how well your models were able to predict future prices.
 % A schematic or flowchart that visually illustrates the steps of your methodology, which will help your readers understand the process you used.
