@@ -123,7 +123,7 @@ bibliotekų palaiko Python programavimo kalbą.
 \subsubsubsection{Python-binance API}
 Šiame darbe naudojama "python-binance" API. Šis API yra "Wrapper" oficialiam Binance API - binance-connector-python. 
 Oficialus API yra labai paprastas ir lengvasvoris, todėl didelio patogumo nėra, tik paprasčiausios užklausos,
-kurias visvien reikėtų apdoroti, labai padeda padaryti šis wrapper API - python-binance.
+kurias visvien reikėtų apdoroti, todėl labai padeda padaryti šis "Wrapper" API.
 
 \subsubsection{Binance}
 Binance yra didžiausia kriptovaliutų birža pagal prekybos apimtį, turinti itin didelį valiutų pasiulą ir patogiai prieinamus duomenis. Ši birža taip pat
@@ -221,7 +221,7 @@ Nestacionarumas matomas ir vizualiai, kadangi yra akivaizdi tendencija žemyn. �
 ADF (Angl. Augmented Dickey-Fuller) testas nustato ar laiko eilutė yra stacionari. Tai yra dažnai naudojamas įrankis analizuojant laiko eilutės ir jų algoritmais, kurie tikisi stacionarių 
 duomenų\cite{chi2018stock}. Stacionariai laiko eilutėje privaloma atmesti nulinę hipotezę tam tikrame užtikrintumo intervale. 
 Jeigu ADF testo absoliuti statistinė vertė yra daugiau už kritinę vertę, nulinę hipotezę yra atmetama ir ši laiko eilutė yra stacionari.
-pritaikius ADF testą{\cite{seabold2010statsmodels}} AMZN akcijų duomenims (\textbf{1 pav.}) gauti rezultatai:
+Pritaikius ADF testą{\cite{seabold2010statsmodels}} AMZN akcijų duomenims (\textbf{1 pav.}) gauti rezultatai:
 
 % p reiksme, alfa reiksmingumo lygis
 \begin{tabularx}{\linewidth}{|X|X|X|X|X|X|}
@@ -232,11 +232,10 @@ pritaikius ADF testą{\cite{seabold2010statsmodels}} AMZN akcijų duomenims (\te
 \end{tabularx}
 
 \vspace{10pt}
-Pagal šiuos rezultatus
+ADF statistika yra skaičius, kuris lyginamas su kritinėmis vertėmis skirtingais lygiais, kad būtų nuspręsta, ar atmesti ar priimti nulinę hipotezę apie stacionarumą. Pagal šiuos rezultatus
 \begin{itemize}
-  \item ADF statistika yra skaičius, kuris lyginamas su kritinėmis vertėmis iš lentelės (skirtingais lygiais), kad būtų nuspręsta, ar atmesti ar priimti nulinę hipotezę apie stacionarumą.
-  \item Pirmu atveju ADF statistika dienos grąžoms yra -7.087, kuri mažesnė, nei kritinė vertė -3.542 1\% lygyje. Todėl nulinė hipotezė yra atmesta ir laiko eilutė laikoma stacionari.
-  \item Antru atveju ADF statistika dienos uždarymo kainoms yra -1.640, kuri yra nemažesnė, nei kritinė vertė -3.542 1\% lygyje. Todėl nulio hipotezė nėra atmesta ir laiko eilutė laikoma nestacionari.
+  \item Pirmu atveju ADF statistika dienos grąžoms yra -7.087, kuri mažesnė, nei kritinė vertė -3.542 1\% lygyje. Nulinė hipotezė yra atmesta ir laiko eilutė laikoma stacionari.
+  \item Antru atveju ADF statistika dienos uždarymo kainoms yra -1.640, kuri yra nemažesnė, nei kritinė vertė -3.542 1\% lygyje. Nulio hipotezė nėra atmesta ir laiko eilutė laikoma nestacionari.
 \end{itemize}
 
 \section{Autoregresiniai modeliai}
@@ -376,9 +375,9 @@ Iš pradžių prisijungiama prie testinio tinklo naudojant API ir naudotojo rakt
 
 \begin{python}
   with open(CONFIG_FILE_NAME, 'r') as config_file:
-  data = json.load(config_file)
-  validate(instance=data, schema=config_schema)
-  client = Client(data['api_key'], data['api_secret'], testnet=True)
+  	data = json.load(config_file)
+  	validate(instance=data, schema=config_schema)
+  	client = Client(data['api_key'], data['api_secret'], testnet=True)
 \end{python}
 
 Tuomet gaunami istoriniai duomenys iš API. Kaip minėta, jog Sausio 4d. įvykio atnaujinimas ir eksperimentiniais tikslais imama duomenys savaitė nuo pradžios į priekį.
@@ -389,12 +388,12 @@ tuomet kviečiami funkcija, jog paverstų gautus duomenis į reikalinga struktū
   df = binance_klines_to_df(klines)
   model_predict_arima(symbol, df)
   model_predict_arima(symbol, df, seasonal=True)
-  
+
   def binance_klines_to_df(klines):
-  klines = np.array(klines)
-  df = pd.DataFrame(klines.reshape(-1, 12), dtype=float, columns=('Open Time','Open', 'High', 'Low', 'Close', 'Volume', 'Close time', 'Quote asset volume', 'Number of trades', 'Taker  buy base asset volume', 'Taker buy quote asset volume', 'Ignore'))
-  df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
-  return df
+  	klines = np.array(klines)
+  	df = pd.DataFrame(klines.reshape(-1, 12), dtype=float, columns=KLINES_COLUMNS)
+  	df['Open Time'] = pd.to_datetime(df['Open Time'], unit='ms')
+  	return df
 \end{python}
 
 Turint duomenis kviečiama model\_predict\_arima funckija, kuri pagal seasonal parametrą atlieka ARIMA arba SARIMA modelį.
@@ -407,21 +406,21 @@ Turint duomenis kviečiama model\_predict\_arima funckija, kuri pagal seasonal p
   training_data = list(df[0:to_row]['Close'])
   
   if seasonal:
-  order, seasonal_order = best_params_arima_seasonal(training_data)
+  	order, seasonal_order = best_params_arima_seasonal(training_data)
   else:
-  order = best_params_arima(training_data)
-  seasonal_order = None
+  	order = best_params_arima(training_data)
+  	seasonal_order = None
   
   testing_data = list(df[to_row:]['Close'])
   model_predictions = []
   for i in range(len(testing_data)):
-  model = ARIMA(training_data, order=order, seasonal_order=seasonal_order)
-  model_fit = model.fit()
-  output = model_fit.forecast(steps=1)
-  yhat = output[0]
-  model_predictions.append(yhat)
-  actual_test_value = testing_data[i]
-  training_data.append(actual_test_value)
+  	model = ARIMA(training_data, order=order, seasonal_order=seasonal_order)
+  	model_fit = model.fit()
+  	output = model_fit.forecast(steps=1)
+  	yhat = output[0]
+  	model_predictions.append(yhat)
+  	actual_test_value = testing_data[i]
+  	training_data.append(actual_test_value)
 \end{python}
 
 Pagrindinė kodo dalis atliekanti skaičiavimus
@@ -539,7 +538,7 @@ Skyriuje siekiama nuodugniai pažvelgti į automatizuoto roboto metodiką bei ro
 Pagrindinis dėmesys bus skiriamas paaiškinimui, kaip kuriamas robotas, kaip atliekami sandoriai ir kokie rezultatai gaunami naudojant skirtingas strategijas.
 
 \subsection{Metodika}
-Robotas parašytas "Python" programavimo kalbą naudojant "python-binance" API bendrauti su Binance testiniu tinklu. 
+Robotas parašytas "Python" programavimo kalbą naudojant "python-binance" API bendrauti su Binance testiniu tinklu\cite{trading_robot}. 
 Yra keli pagrindiniai žingsniai roboto veikime.
 
 \begin{enumerate}
@@ -663,7 +662,7 @@ ir galiausiai grįš, todėl bandoma atlikti pardavimą. Ir atvirkščiai, jei t
 
 \subsection{Realizacija}
 
-Toliau robotui sandoriams atlikti pasirinktos šios kriptovaliutų poros 
+Toliau robotui sandoriams atlikti pasirinktos šios kriptovaliutų poros. 
 \begin {itemize}
 \item BTC/BUSD
 \item ETH/BUSD
@@ -723,12 +722,12 @@ Ištirsime, kaip robotas integruoja šias strategijas ir procesą, kuriuo jis pa
 
 Programos pradžioje, praėjus validacijai ir inicializacijai, kodas patikrina, kokia prekybos strategija pasirinkta ir pagal tai atlieka reikiamus skaičiavimus. Jei pasirenkama MEAN\_STRATEGY, nuskaitoma istorines kriptovaliutos kainas (tiek pastarųjų verčių koks ilgojo slankaus vidurkio parametras) ir apskaičiuoja trumpąjį ir ilgąjį paprastąjį slankųjį vidurkį (SMA). Jei pasirinkta TENDNCY\_ARIMA, ji nuskaito pastarųjų 1000 intervalo "candlesticks" eilučių duomenis ir apskaičiuoja ARIMA prognozę.
 \begin{python}
-if self._strategy == MEAN_STRATEGY:
-    self._get_historic_prices(limit=self._long_term)
-    self._calculate_sma()
-elif self._strategy == TENDENCY_STRATEGY:
-    self._get_klines_as_df(limit=1000)
-    self._calculate_arima()
+  if self._strategy == MEAN_STRATEGY:
+  self._get_historic_prices(limit=self._long_term)
+  self._calculate_sma()
+  elif self._strategy == TENDENCY_STRATEGY:
+  self._get_klines_as_df(limit=1000)
+  self._calculate_arima()
 \end{python}
 
 Toliau, kai praeina nustatytas "timeout" laikas, programa kviečia \_try\_trade funkciją , kuri vykdo atitinkamą prekybos strategiją priklausomai nuo strategijos. Abi strategijos atnaujina savo duomenis, išmesdama seniausia verte ir pridedama
@@ -736,30 +735,30 @@ naujausia kainos vertę, tuomet pagal strategija atliekami SMA arba ARIMA skaič
 užsakymą.
 
 \begin{python}
-def _try_trade(self) -> None:
-	klines = 1
-	if self._strategy == MEAN_STRATEGY:
-		self._get_historic_prices(klines)
-		self._calculate_sma()
-		self._trade_sma()
-	elif self._strategy == TENDENCY_STRATEGY:
-		self._get_klines_as_df(klines)
-		self._calculate_arima()
-		self._trade_arima()
+  def _try_trade(self) -> None:
+  klines = 1
+  if self._strategy == MEAN_STRATEGY:
+  self._get_historic_prices(klines)
+  self._calculate_sma()
+  self._trade_sma()
+  elif self._strategy == TENDENCY_STRATEGY:
+  self._get_klines_as_df(klines)
+  self._calculate_arima()
+  self._trade_arima()
 \end{python}
 
 Šis kodo blokas gauna vidutinę konkretaus simbolio kainą rinkoje jeigu yra nustatytas "LIMIT" užsakymo tipas ir atlieka sandorius pagal strategiją. Patikrinama, ar trumpalaikis SMA didesnis už ilgalaikį SMA ir ar esama pozicija yra pirki, o jei tenkinamos abi sąlygos, pateikia užsakymą parduoti nurodytą simbolio kiekį už apskaičiuotą vidutinę kainą. Jei trumpalaikis SMA yra mažesnis už ilgalaikį SMA, o dabartinė pozicija yra parduoti, pateikiamas užsakymas pirkti nurodytą simbolio kiekį. Atlikus sandorį, padėtis atnaujinama, kad atspindėtų naują būseną. Analogiškai vyksta ir tendencijos strategijoje - tikrinama ar ARIMA prognozuojama kainą yra didesnę ar mažesnę už dabartinę vidutinę kainą ir atitinkamai atliekamas užsakymas.
 
 \begin{python}
-    price = None
-    if config['order_type'] == Client.ORDER_TYPE_LIMIT:
-        price = self._get_symbol_avg_price(symbol)
-    if short_sma > long_sma and position == 'BUY':
-        if self._make_order(symbol, position, config['trade_quantity'], price):
-            config['position'] = 'SELL'
-    elif short_sma < long_sma and position == 'SELL':
-        if self._make_order(symbol, position, config['trade_quantity'], price):
-            config['position'] = 'BUY'
+  price = None
+  if config['order_type'] == Client.ORDER_TYPE_LIMIT:
+  price = self._get_symbol_avg_price(symbol)
+  if short_sma > long_sma and position == 'BUY':
+  if self._make_order(symbol, position, config['trade_quantity'], price):
+  config['position'] = 'SELL'
+  elif short_sma < long_sma and position == 'SELL':
+  if self._make_order(symbol, position, config['trade_quantity'], price):
+  config['position'] = 'BUY'
 \end{python}
 
 Funkcija \_make\_order naudojama norint atlikti konkretaus simbolio užsakymą su nurodyta puse (pirkti arba parduoti), kiekiu ir kaina. Naudojama „create\_order“ metodą iš „Binance“ API ir nustato simbolio parametrus remiantis konfigūracija.
@@ -769,29 +768,29 @@ Funkcija turi pakartotinio bandymo mechanizmą, kad kelis kartus būtų bandoma 
 Po kiekvieno bandymo funkcija laukia tam tikrą laiką, apibrėžtą ORDER\_RETRY\_WAIT\_TIME (prekybos atveju šis kintamasis yra - 10), prieš bandydama dar kartą. Jei užsakymas bus užpildytas, atsakymo būsena bus „FILLED“, o funkcija grąžins True, nurodydama, kad užsakymas įvykdytas sėkmingai.
 
 \begin{python}
-def _make_order(self, symbol: str, side: str, qty: float, price: float = None) -> bool:
-        # Retry is useful if order type is LIMIT
-        retries = 0
-        order_completed = False
-        while not order_completed and retries < ORDER_MAX_RETRIES:
-            try:
-                response = self._client.create_order(
-                    symbol=symbol,
-                    side=side,
-                    type=self._pairs_config[symbol]['order_type'],
-                    quantity=qty,
-                    price=price,
-                    timeInForce=self._pairs_config[symbol]['time_in_force'],
-                )
-                print(f"{response['side']} {response['type']} {response['symbol']} {response['status']}")
-                if response['status'] == Client.ORDER_STATUS_FILLED:
-                    order_completed = True
-                    break
-            except exceptions.BinanceOrderException as e:
-                print(e.message)
-            retries += 1
-            time.sleep(ORDER_RETRY_WAIT_TIME)
-        return order_completed
+  def _make_order(self, symbol: str, side: str, qty: float, price: float = None) -> bool:
+  # Retry is useful if order type is LIMIT
+  retries = 0
+  order_completed = False
+  while not order_completed and retries < ORDER_MAX_RETRIES:
+  try:
+  response = self._client.create_order(
+  symbol=symbol,
+  side=side,
+  type=self._pairs_config[symbol]['order_type'],
+  quantity=qty,
+  price=price,
+  timeInForce=self._pairs_config[symbol]['time_in_force'],
+  )
+  print(f"{response['side']} {response['type']} {response['symbol']} {response['status']}")
+  if response['status'] == Client.ORDER_STATUS_FILLED:
+  order_completed = True
+  break
+  except exceptions.BinanceOrderException as e:
+  print(e.message)
+  retries += 1
+  time.sleep(ORDER_RETRY_WAIT_TIME)
+  return order_completed
 \end{python}
 
 
@@ -882,12 +881,24 @@ tokioje aplinkoje.
 
 % Išvadose ir pasiūlymuose, nekartojant atskirų dalių apibendrinimų,
 % suformuluojamos svarbiausios darbo išvados, rekomendacijos bei pasiūlymai.
-\section{Išvados}
-Taigi apibendrinant šiame darbe atlikti keli dalykai
+\section{Išvados ir rezultatai}
+
+Šiame darbe buvo siekiama sukurti automatizuota kriptovaliutų robotą, kuris implementuoja strategijas taikančias autoregresines modelių analizes.
+Tikslui pasiekti buvo įvykdyti šie uždaviniai: susipažinta su autoregresiniais modeliais, jų savybėmis; susipažinta su darbine aplinka ir sukurtas
+robotas naudojantis šiuos įrankius; susipažinta su strategijomis ir jos pritaikytos robotui. 
+
+Projekto metu sukurtas automatizuotas robotas
+
+Rezultatai
 \begin{itemize}
   \item atlikta autoregresinių modelių analizė,
+  \item sukurtas robotas gebantis prekiauti testiniame tinkle
+\end{itemize}
+
+Išvados
+\begin{itemize}
   \item parinkta naudoti ARIMA modelį prognozėmis,
-  \item sukurtas robotas gebantis prekiauti remiantis strategijomis testiniame tinkle
+  \item robotas daugiau prekybos atlieka taikant tendencijos strategija
 \end{itemize}
 
 Neišvengiama, jog tokiame trumpame darbe būtų aptartos visos įmanomos sritys ir atvejai, taigi tolimesnei tyrimo eigai pasiūlymas nagrinėti kitus modelius
@@ -925,6 +936,8 @@ prekybos rinką ją konvertuoją i panašių token valiuta kaip BUSD(us -regulat
 \textbf{MSE} - Vidutinė kvadratinė paklaida, angl. (Mean squared error)
 
 \textbf{MAPE} - Vidutinė  bsoliučioji paklaida išreikšta procentais, angl. (Mean absolute percentage error)
+
+\textbf{Wrapper API} - sluoksnis, esantis ant esamo API, kuris palengvina naudojimą. Tai suteikia supaprastintą sąsają prieigai prie pagrindinio API, padarydama ją patogesnę vartotojui. „Python“ Wrapper API pavyzdys yra „python-binance“, kuris apgaubia „Binance“ API, kad būtų galima patogiai bendrauti su „Binance“ platforma.
 
 \printbibliography[heading=bibintoc] % Aprašomi literatūros šaltiniai
 
