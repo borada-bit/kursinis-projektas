@@ -245,8 +245,8 @@ Populiarusi ir dažniausiai sutinkami modeliai yra ARMA(p, q) ir ARIMA(p, d, q).
 Taip pat yra SARIMA, SARFIMA ir kitų modelių, turinčių savo specifinius panaudjimo atvejus. 
 
 \subsection{AR modelis}
-AR (angl. autoregressive) modelis remiasi tik praeities duomenimis, kad nuspėti kintamojo reikšme ateityje, ieškoma ar pastebimas pasikartojantis
-modelis, kuris padėtų tiksliau nuspėti dydį ateityje\cite{chi2018stock}. Šis modelis dar dažnai vadinamas ARp modeliu, nes naudojamas kintamasis "p", nusakantis kiek praeiteis reikšmių 
+AR (angl. autoregressive) modelis remiasi tik praeities duomenimis, kad nuspėti kintamojo reikšme ateityje. Ieškoma ar pastebimas pasikartojantis
+modelis, kuris padėtų tiksliau atlikti prognozę ateityje\cite{chi2018stock}. Šis modelis dar dažnai vadinamas ARp modeliu, nes naudojamas kintamasis "p", nusakantis kiek praeiteis reikšmių 
 iš laiko periodo norima naudoti. Laikant, kad kintamasis X yra laiko eilutės kintamasis AR(p) modelio formulė gali atrodyti taip: 
 \[X_{t} = \Phi _{1}X_{t-1}+\epsilon_{t} \]
 
@@ -262,15 +262,15 @@ ${X_t}$ - stacionari laiko eilutė, q - MA modelio laipsnis, ${\epsilon_t}$ - MA
 
 \subsection {ARMA modelis}
 ARMA (angl. autorogressive moving average) modelis yra autoregresyviaus ir slankaus vidurkio modelio junginys. Modelis dažnai žymimas
-kaip ARMA(p, q), kur p yra AR laipsnis, o q yra MA laispnis. Pirmą kartą sujungtas 1938 mokslininko Herman Wold, jis pastebėjo jog ARMA modelis gal apimti 
-dideles stacionarias laiko eilutes, kai yra tinkamai nurodytas p laipsnis ir q laipsnis\cite{makridakis1997arma}. Taip pat reikia pabrėžti, 
-jog ARMA(0, q) = MA(q) ir ARMA(p, 0) = AR(p) Reiškia, jog Xt eilutė gali būti modeliuojama kaip kombinacija praeities $x_{t}$ reikšmių ir/arba praeities $e_{t}$ klaidų:
+kaip ARMA(p, q), kur \textbf{p} yra AR laipsnis, o \textbf{q} yra MA laispnis. Pirmą kartą sujungtas 1938 mokslininko Herman Wold, jis pastebėjo jog ARMA modelis gal apimti 
+dideles stacionarias laiko eilutes, kai yra tinkamai nurodytas p ir q laipsnis\cite{makridakis1997arma}. Taip pat reikia pabrėžti, 
+jog ARMA(0, q) = MA(q) ir ARMA(p, 0) = AR(p). Reiškia, jog Xt eilutė gali būti modeliuojama kaip kombinacija praeities $x_{t}$ reikšmių ir/arba praeities $e_{t}$ klaidų:
 \[X_{t} = \phi_{1}x_{t-1} + \phi_{2}x_{t-2} + ... + \phi_{p}x_{t-p} + e_{t} - \theta_{1}e_{t-1} - \theta_{2}e_{t-2} - ... - \theta_{q}e_{t-q}\]
 
 
 \subsection {ARIMA modelis}
 ARIMA (angl. autoregressive integrated moving average) modelis yra paplitęs nuo 1970-ųjų iki šių dienų. Modelio pavadinimo šifravimas
-pažodžiui: AR - Autoregresinis modelis, I - Integracija (Diferencijavimas), atsižvelgiama į duomenų tendenciją, MA - (Moving average) slankusis vidurkis.
+pažodžiui: AR - Autoregresinis modelis, I - Integracija (Diferencijavimas), atsižvelgiama į duomenų tendenciją, MA - (Moving average) Slankusis vidurkis.
 AR ir MA yra atskiri modeliai, kurie gali būti naudojami paprastesnei laiko eilučiu analizei. Šio modelio privalumas, jog jis sujungia AR ir MA naudojimą kartu su
 diferencijavimu, kuris suteikia galimybė giliau analizuoti laiko eilutes. Diferencijavimo dalis turimus duomenis padeda paversti į stacionarius, 
 kurie yra reikalingi korektiškam modelio veikimui. Diferencijavimas vyksta baigtinį kartų skaičių, jog būtų pasiekta beveik-validi stacionari būseną. 
@@ -278,15 +278,6 @@ Kitais žodžiais ARIMA yra ekvivalentus ARMA modelis tiem patiems MA ir AR laip
 Pagrindinis skirtumas tarp šių modelių yra tas, jog ARIMA konvertuoja nestacionarius duomenis į stacionarius prieš dirbant su jais. Modelio tipas yra 
 klasifikuojamas kaip ARIMA(p,d,q), kur p - autoregresyvoji dalis, d - integravimo (diferencijavimo) dalis, q - slenkančio vidurkio dalis. Visos ARIMA modelio
 reikšmės yra neneigiami sveikieji skaičiai \cite{mondal2014study}.
-
-% Not sure about this
-% dažniausiai negalima naudoti šiame kontekste
-Dažniausiai yra 3 žingsniai naudoti ARIMA modelį:
-\begin{enumerate}
-  \item Duomenų surinkimas ir verifikavimas - tikriname ar gauti duomenys yra stacionarūs ir ieškome sezoniškumo.
-  \item Diferencijavimas - vertimas laiko eilutę į stacionarią.
-  \item Prognozavimas naudojant ARIMA modelį - dažniausias taikomas ARIMA modelis yra ARIMA(1,1,0)
-\end{enumerate}
 
 \subsection {SARIMA modelis}
 SARIMA (angl. seasonal autoregressive integrated moving average) modelis yra ARIMA modelio išplėtimas turintis vieną papildomą savybę - sezoniškumą\cite{carl2020ethereum}. 
